@@ -19,6 +19,7 @@ def get_nav(id):
 
 
 # Create handle to Google Sheet and find column to update
+# pylint: disable=E1101
 portfolio = PortfolioHandle()
 ws = portfolio.sheet.get_worksheet(1)
 col_idx = ws.find('Prezzo di mercato').col
