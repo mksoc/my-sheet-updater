@@ -1,6 +1,12 @@
 from sheet_handles import PortfolioHandle
 from price_getter import PriceGetter
 
+def print_price(isin, price):
+  if 'US' in isin:
+    print(f'\t${price:.2f}')
+  else:
+    print(f'\t€{price:.2f}')
+
 # Create handle to Google Sheet and find column to update
 # pylint: disable=E1101
 portfolio = PortfolioHandle()
@@ -14,6 +20,7 @@ pg = PriceGetter()
 isin_list = [
   'LU0552385295',
   'LU0594300096',
+  'US69608A1088',
   'LU0171306680',
   'IE00B11XZ103',
   'IE00BK5BQT80',
@@ -25,12 +32,13 @@ isin_list = [
 ]
 items = len(isin_list)
 
+
 # For each entry, retrieve NAV and update sheet
 for index, isin in enumerate(isin_list):
   print(f'({index + 1}/{items})', end=' ', flush=True)
   row_idx = ws.find(isin).row
   price = pg.price(isin)
-  print(f'\t€{price:.2f}')
+  print_price(isin, price)
   ws.update_cell(row_idx, col_idx, price)
 
 print('Done.')

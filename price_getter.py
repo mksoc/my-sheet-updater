@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import re
+from yahoo_fin import stock_info
 
 
 class PriceGetter:
@@ -23,6 +24,10 @@ class PriceGetter:
     'IT0005410904': 'obbligazioni/mot/btp/scheda/IT0005410912',
     'IE00BK5BQT80': 'etf/scheda/IE00BK5BQT80'}
 
+  _nyse_dict = {
+    'US69608A1088': 'PLTR'
+  }
+
   def price(self, isin):
     pricer = self._get_pricer(isin)
     return pricer(isin)
@@ -32,6 +37,8 @@ class PriceGetter:
       return self._get_morningstar
     elif isin in self._aff_dict:
       return self._get_aff
+    elif isin in self._nyse_dict:
+      return self._get_nyse
     else:
       raise ValueError(f'{isin} not found.')
 
@@ -62,8 +69,18 @@ class PriceGetter:
     page = requests.get(url)
 
     soup = BeautifulSoup(page.content, 'html.parser')
+    # pylint: disable=W1401
     table_div = soup.find('h3', string=re.compile('Dati Mercato\s')).parent.parent
     table = table_div.find('table', class_="m-table -clear-mtop")
     price_row = table.find('tr')
     price = price_row.find('span', class_="t-text -right").string.replace(',', '.')
+    return round(float(price), 2)
+
+  def _get_nyse(self, isin):
+    """
+    Parse HTML of NYSE page and extract the price
+    """
+    print(f'Looking up price of {isin} on NYSE...')
+    ticker = self._nyse_dict[isin]
+    price = stock_info.get_live_price(ticker)
     return round(float(price), 2)
