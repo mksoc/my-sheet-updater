@@ -16,19 +16,21 @@ isin_list = [
   'LU0594300096',
   'LU0171306680',
   'IE00B11XZ103',
+  'IE00BK5BQT80',
   'LU0512749036',
   'LU0849399786',
   'FR0010923383',
-  'FR0013534898'
+  'FR0013534898',
+  'IT0005410904'
 ]
 items = len(isin_list)
 
 # For each entry, retrieve NAV and update sheet
 for index, isin in enumerate(isin_list):
-  print(f'({index + 1}/{items}) Updating price of {isin}...', end=' ', flush=True)
+  print(f'({index + 1}/{items})', end=' ', flush=True)
   row_idx = ws.find(isin).row
   price = pg.price(isin)
-  print(f'€{price:.2f}')
+  print(f'\t€{price:.2f}')
   ws.update_cell(row_idx, col_idx, price)
 
 print('Done.')
